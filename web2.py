@@ -222,22 +222,6 @@ combined_pm_courts['Remove'] = False
 # Provide interface to remove courts
 st.header("Grouped PM Data (Including AM 'H' Courts and PM 'H' and 'M' Courts)")
 
-# Create a form to display and update remove status
-with st.form(key='remove_form'):
-    # Display the combined PM courts with checkboxes to remove
-    for idx, row in combined_pm_courts.iterrows():
-        court = row['Court']
-        label = row['Label']
-        time = row['Time']
-        hearing_type = row['Hearing_Type']
-        accused = row['Accused']
-        remove = st.checkbox(f"Remove Court {court} - {label} - Time: {time} - Hearing Type: {hearing_type} - Accused: {accused}", value=row['Remove'])
-        combined_pm_courts.at[idx, 'Remove'] = remove
-
-    # Submit button to update remove status
-    submitted = st.form_submit_button("Update PM Courts")
-    if submitted:
-        st.success("PM courts updated.")
 
 # Filter out removed courts
 display_pm_courts = combined_pm_courts[~combined_pm_courts['Remove']]
@@ -252,8 +236,7 @@ st.dataframe(
     use_container_width=True
 )
 
-# 5. Display the assignments with editable functionality
-st.header("Edit Remarks")
+
 
 # Define column configuration
 column_config = {
@@ -266,52 +249,10 @@ column_config = {
         'PM M/H',
         help='Edit PM M/H',
         width='small',
-    ),
-    'Remarks': st.column_config.TextColumn(
-        'Remarks',
-        help='Enter any remarks or notes for the court session',
-        width='large',
-    ),
-    'Ended': st.column_config.CheckboxColumn(
-        'Ended',
-        help='Indicate if the court session has ended',
-        width='small',
-    ),
+    )
 }
 
-# Display the data editor
-edited_assignments = st.data_editor(
-    df_template_simple,
-    column_config=column_config,
-    hide_index=True,
-    use_container_width=True,
-    num_rows='dynamic',
-    key='data_editor'
-)
 
-# Update the assignments DataFrame
-df_template_simple = edited_assignments
-
-# After editing, update the Court Status
-df_court_status = df_template_simple[
-    (df_template_simple['AM M/H'] != "") | (df_template_simple['PM M/H'] != "")
-].reset_index(drop=True)
-
-# Display the updated Court Status
-st.header("Updated Court Status")
-
-st.dataframe(
-    df_court_status.style.apply(highlight_ended_rows, axis=1),
-    use_container_width=True
-)
-
-# 6. Display the general remarks text area
-st.header("General Remarks")
-general_remarks = st.text_area(
-    "Enter your general remarks or notes here:",
-    value="",
-    height=150
-)
 
 # 7. Others (e.g., Export Functionality)
 
@@ -337,8 +278,6 @@ if st.button("Export to Excel"):
         # Prepare the DataFrame for export
         export_df = df_template_simple[selected_columns].copy()
         # If 'General Remarks' is selected, add it to the DataFrame
-        if 'General Remarks' in selected_columns:
-            export_df['General Remarks'] = general_remarks
         export_df.to_excel(writer, index=False, sheet_name='Court Data')
         # Export PM courts with remove status
         pm_courts_export = combined_pm_courts[['Court', 'Label', 'Time', 'Hearing_Type', 'Accused', 'Remove']]
