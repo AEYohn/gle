@@ -42,12 +42,12 @@ def extract_name(accused_str):
 def fetch_court_data(court, start, end):
     url = 'https://www.judiciary.gov.sg/hearing-list/GetFilteredList/'
     headers = {
-        "Content-Type": "application/json; charset=utf-8",
-        "Accept": "*/*",
-        "X-Requested-With": "XMLHttpRequest",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+              "Content-Type": "application/json; charset=utf-8",
+              "Accept": "application/json, text/javascript, */*; q=0.01",
+              "X-Requested-With": "XMLHttpRequest",
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+          }
 
-    }
     body = {
         "SearchKeywords": court,
         "SelectedStartDate": start,
